@@ -20884,6 +20884,7 @@ const struct SpeciesInfo gSpeciesInfoGen1[] =
     },
 #endif //P_FAMILY_MEW
 
+
 #ifdef __INTELLISENSE__
 };
 #endif

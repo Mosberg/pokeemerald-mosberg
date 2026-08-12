@@ -2,7 +2,7 @@
 description: "Use when a task spans multiple subsystems, requires repo-wide coordination, or needs a staged workflow across battle systems, docs, validation, and asset/data work."
 name: "Orchestrator"
 argument-hint: "Describe the project-wide task or multi-step change that needs coordination across specialists."
-tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
+tools: [vscode, execute, read, agent, ms-dotnettools.vscode-dotnet-runtime/installDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/listDotNetVersions, ms-dotnettools.vscode-dotnet-runtime/recommendedDotNetSdkVersion, ms-dotnettools.vscode-dotnet-runtime/findDotNetPath, ms-dotnettools.vscode-dotnet-runtime/uninstallSystemDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/uninstallVSCodeDotNetRuntime, ms-dotnettools.vscode-dotnet-runtime/getDotNetSettingsInfo, ms-dotnettools.vscode-dotnet-runtime/listInstalledDotNetVersions, ms-python.python/getPythonEnvironmentInfo, ms-python.python/getPythonExecutableCommand, ms-python.python/installPythonPackage, ms-python.python/configurePythonEnvironment, ms-vscode.cpp-devtools/GetSymbolReferences_CppTools, ms-vscode.cpp-devtools/GetSymbolInfo_CppTools, ms-vscode.cpp-devtools/GetSymbolCallHierarchy_CppTools, edit, search, web, browser, todo]
 user-invocable: true
 agents: ["Project Maintainer", "Battle Systems", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]
 ---

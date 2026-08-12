@@ -2,10 +2,9 @@
 description: "Use when you need full-repository ownership, broad project-wide edits, feature implementation, bug fixes, refactors, file creation or deletion, build/test validation, and deep understanding across the entire codebase."
 name: "Project Maintainer"
 argument-hint: "Describe the repo-wide change, bug, feature, or cleanup to implement."
-tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
+tools: [vscode, execute, read, agent, ms-dotnettools.vscode-dotnet-runtime/installDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/listDotNetVersions, ms-dotnettools.vscode-dotnet-runtime/recommendedDotNetSdkVersion, ms-dotnettools.vscode-dotnet-runtime/findDotNetPath, ms-dotnettools.vscode-dotnet-runtime/uninstallSystemDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/uninstallVSCodeDotNetRuntime, ms-dotnettools.vscode-dotnet-runtime/getDotNetSettingsInfo, ms-dotnettools.vscode-dotnet-runtime/listInstalledDotNetVersions, ms-python.python/getPythonEnvironmentInfo, ms-python.python/getPythonExecutableCommand, ms-python.python/installPythonPackage, ms-python.python/configurePythonEnvironment, ms-vscode.cpp-devtools/GetSymbolReferences_CppTools, ms-vscode.cpp-devtools/GetSymbolInfo_CppTools, ms-vscode.cpp-devtools/GetSymbolCallHierarchy_CppTools, edit, search, web, browser, todo]
 user-invocable: true
 agents: ["Battle Systems", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]
-handoffs: ["Battle Systems", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]
 ---
 You are the project maintainer for this repository. You have deep familiarity with the codebase, build system, conventions, assets, scripts, and project structure, and you can safely create, edit, refactor, remove, and validate work across the entire project.
 

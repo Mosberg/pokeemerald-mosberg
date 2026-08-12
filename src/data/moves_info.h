@@ -23660,4 +23660,68 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         .ignoresProtect = TRUE,
         .battleAnimScript = gBattleAnimMove_GMaxRapidFlow,
     },
+
+    [MOVE_ASTRAL_LANCE] =
+    {
+        .name = COMPOUND_STRING("Astral Lance"),
+        .description = COMPOUND_STRING(
+            "A radiant lance of cosmic force that\n"
+            "pierces through the foe."),
+        .effect = EFFECT_HIT,
+        .power = 120,
+        .type = TYPE_PSYCHIC,
+        .accuracy = 100,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+    },
+
+    [MOVE_FERRO_THRUST] =
+    {
+        .name = COMPOUND_STRING("Ferro Thrust"),
+        .description = COMPOUND_STRING(
+            "The user crashes into the target with\n"
+            "a dense iron body slam."),
+        .effect = EFFECT_HIT,
+        .power = 110,
+        .type = TYPE_STEEL,
+        .accuracy = 95,
+        .pp = 10,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+    },
+
+    [MOVE_NIMBARA_BLOSSOM] =
+    {
+        .name = COMPOUND_STRING("Nimbara Blossom"),
+        .description = COMPOUND_STRING(
+            "A cloud of fragrant pollen and leaves\n"
+            "bursts out in a swirling wave."),
+        .effect = EFFECT_HIT,
+        .power = 100,
+        .type = TYPE_GRASS,
+        .accuracy = 100,
+        .pp = 12,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+    },
+
+    [MOVE_COSMIC_SUNDER] =
+    {
+        .name = COMPOUND_STRING("Cosmic Sunder"),
+        .description = COMPOUND_STRING(
+            "The user tears open a crack in the sky\n"
+            "and hammers the foe with starlight."),
+        .effect = EFFECT_HIT,
+        .power = 140,
+        .type = TYPE_DRAGON,
+        .accuracy = 90,
+        .pp = 8,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+    },
 };

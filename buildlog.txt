@@ -1,0 +1,4 @@
+make[1]: *** [make_tools.mk:35: history] Error 1
+make[1]: *** Waiting for unfinished jobs....
+-e [0;31mfatal: [0m[1;33mno git history found. You will be unable to use version control, update pokeemerald-expansion, or use feature branches. To use version control, use `git` to clone the repository instead of using "Download Zip" on GitHub. Run `touch .histignore` to ignore this and continue anyways.[0m
+Makefile:296: *** Errors occurred while building tools. See error messages above for more details.  Stop.

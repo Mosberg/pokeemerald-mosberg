@@ -2472,4 +2472,25 @@ const struct AbilityInfo gAbilitiesInfo[ABILITIES_COUNT] =
         .name = _("Spicy Spray"),
         .description = COMPOUND_STRING("Burns the foe when damaged."),
     },
+
+    [ABILITY_ASTRAL_GLOW] =
+    {
+        .name = _("Astral Glow"),
+        .description = COMPOUND_STRING("Transforms moonlight into radiant power."),
+        .aiRating = 10,
+    },
+
+    [ABILITY_FERRO_MIGHT] =
+    {
+        .name = _("Ferro Might"),
+        .description = COMPOUND_STRING("Turns heavy iron force into devastating blows."),
+        .aiRating = 9,
+    },
+
+    [ABILITY_NIMBARA_HUSH] =
+    {
+        .name = _("Nimbara Hush"),
+        .description = COMPOUND_STRING("Pollen calms the field and sharpens focus."),
+        .aiRating = 8,
+    },
 };

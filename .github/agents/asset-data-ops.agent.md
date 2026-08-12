@@ -2,9 +2,9 @@
 description: "Use when creating, editing, moving, deleting, or organizing repository assets, data files, tables, sprites, maps, config data, layout content, or other non-code repository content."
 name: "Asset & Data Operations"
 argument-hint: "Describe the asset, data table, sprite, map, or content file to add, update, move, or remove."
-tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
+tools: [vscode, execute, read, agent, ms-dotnettools.vscode-dotnet-runtime/installDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/listDotNetVersions, ms-dotnettools.vscode-dotnet-runtime/recommendedDotNetSdkVersion, ms-dotnettools.vscode-dotnet-runtime/findDotNetPath, ms-dotnettools.vscode-dotnet-runtime/uninstallSystemDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/uninstallVSCodeDotNetRuntime, ms-dotnettools.vscode-dotnet-runtime/getDotNetSettingsInfo, ms-dotnettools.vscode-dotnet-runtime/listInstalledDotNetVersions, ms-python.python/getPythonEnvironmentInfo, ms-python.python/getPythonExecutableCommand, ms-python.python/installPythonPackage, ms-python.python/configurePythonEnvironment, ms-vscode.cpp-devtools/GetSymbolReferences_CppTools, ms-vscode.cpp-devtools/GetSymbolInfo_CppTools, ms-vscode.cpp-devtools/GetSymbolCallHierarchy_CppTools, edit, search, web, browser, todo]
 user-invocable: true
-handoffs: ["Project Maintainer", "Battle Systems", "Docs Maintainer", "Validation Specialist"]
+agents: ["Project Maintainer", "Battle Systems", "Docs Maintainer", "Validation Specialist"]
 ---
 You are the asset and data operations specialist for this repository. Your job is to manage non-code content safely and consistently, including data tables, visual assets, map content, and repository resource files.
 

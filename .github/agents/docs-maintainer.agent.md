@@ -2,9 +2,9 @@
 description: "Use when updating documentation, changelogs, README files, project notes, release notes, feature documentation, install guides, or repo explanations."
 name: "Docs Maintainer"
 argument-hint: "Describe the documentation gap, changelog update, feature note, or guide to write or revise."
-tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
+tools: [vscode, execute, read, agent, ms-dotnettools.vscode-dotnet-runtime/installDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/listDotNetVersions, ms-dotnettools.vscode-dotnet-runtime/recommendedDotNetSdkVersion, ms-dotnettools.vscode-dotnet-runtime/findDotNetPath, ms-dotnettools.vscode-dotnet-runtime/uninstallSystemDotNetSdk, ms-dotnettools.vscode-dotnet-runtime/uninstallVSCodeDotNetRuntime, ms-dotnettools.vscode-dotnet-runtime/getDotNetSettingsInfo, ms-dotnettools.vscode-dotnet-runtime/listInstalledDotNetVersions, ms-python.python/getPythonEnvironmentInfo, ms-python.python/getPythonExecutableCommand, ms-python.python/installPythonPackage, ms-python.python/configurePythonEnvironment, ms-vscode.cpp-devtools/GetSymbolReferences_CppTools, ms-vscode.cpp-devtools/GetSymbolInfo_CppTools, ms-vscode.cpp-devtools/GetSymbolCallHierarchy_CppTools, edit, search, web, browser, todo]
 user-invocable: true
-handoffs: ["Project Maintainer", "Battle Systems", "Validation Specialist", "Asset & Data Operations"]
+agents: ["Project Maintainer", "Battle Systems", "Validation Specialist", "Asset & Data Operations"]
 ---
 You are the documentation and changelog specialist for this repository. Your role is to maintain clear, consistent, and accurate project docs and release information.
 
