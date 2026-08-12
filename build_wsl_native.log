@@ -1,0 +1,3 @@
+make[1]: make_tools.mk: No such file or directory
+make[1]: *** No rule to make target 'make_tools.mk'.  Stop.
+Makefile:296: *** Errors occurred while building tools. See error messages above for more details.  Stop.
