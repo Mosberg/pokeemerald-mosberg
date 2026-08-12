@@ -2,7 +2,7 @@
 description: "Use when validating builds, testing patches, checking CI expectations, running ROM validation, or confirming that a change passes the repository’s relevant verification steps."
 name: "Validation Specialist"
 argument-hint: "Describe the patch, build target, CI check, or ROM validation you need to verify."
-tools: [read, search, execute, todo]
+tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
 user-invocable: true
 handoffs: ["Project Maintainer", "Battle Systems", "Docs Maintainer", "Asset & Data Operations"]
 ---

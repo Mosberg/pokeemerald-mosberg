@@ -2,7 +2,7 @@
 description: "Use when you need full-repository ownership, broad project-wide edits, feature implementation, bug fixes, refactors, file creation or deletion, build/test validation, and deep understanding across the entire codebase."
 name: "Project Maintainer"
 argument-hint: "Describe the repo-wide change, bug, feature, or cleanup to implement."
-tools: [read, search, edit, execute, agent, todo]
+tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
 user-invocable: true
 agents: ["Battle Systems", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]
 handoffs: ["Battle Systems", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]

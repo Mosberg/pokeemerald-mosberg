@@ -2,7 +2,7 @@
 description: "Use when updating documentation, changelogs, README files, project notes, release notes, feature documentation, install guides, or repo explanations."
 name: "Docs Maintainer"
 argument-hint: "Describe the documentation gap, changelog update, feature note, or guide to write or revise."
-tools: [read, search, edit, todo]
+tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
 user-invocable: true
 handoffs: ["Project Maintainer", "Battle Systems", "Validation Specialist", "Asset & Data Operations"]
 ---

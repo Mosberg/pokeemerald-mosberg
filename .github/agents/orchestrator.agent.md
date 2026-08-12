@@ -2,7 +2,7 @@
 description: "Use when a task spans multiple subsystems, requires repo-wide coordination, or needs a staged workflow across battle systems, docs, validation, and asset/data work."
 name: "Orchestrator"
 argument-hint: "Describe the project-wide task or multi-step change that needs coordination across specialists."
-tools: [read, search, edit, execute, agent, todo]
+tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
 user-invocable: true
 agents: ["Project Maintainer", "Battle Systems", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]
 ---

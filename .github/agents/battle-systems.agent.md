@@ -2,7 +2,7 @@
 description: "Use when working on battle logic, moves, AI, battle scripts, encounter balance, status conditions, battle engine systems, turn resolution, and combat-related code and data."
 name: "Battle Systems"
 argument-hint: "Describe the battle mechanic, script, move, AI, or combat bug to fix or add."
-tools: [read, search, edit, execute, todo]
+tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
 user-invocable: true
 handoffs: ["Project Maintainer", "Docs Maintainer", "Validation Specialist", "Asset & Data Operations"]
 ---

@@ -2,7 +2,7 @@
 description: "Use when creating, editing, moving, deleting, or organizing repository assets, data files, tables, sprites, maps, config data, layout content, or other non-code repository content."
 name: "Asset & Data Operations"
 argument-hint: "Describe the asset, data table, sprite, map, or content file to add, update, move, or remove."
-tools: [read, search, edit, execute, todo]
+tools: [read, search, edit, create, delete, execute, agent, todo, sql, skill]
 user-invocable: true
 handoffs: ["Project Maintainer", "Battle Systems", "Docs Maintainer", "Validation Specialist"]
 ---
