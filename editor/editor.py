@@ -208,12 +208,13 @@ class SearchableList(tk.Frame):
         self._on_select = on_select
         self._tag_map = {}
         self._favorites = set()
+        self._sort_values = {}
         self._sort_var = tk.StringVar(value="Name A-Z")
         self._tag_var = tk.StringVar(value="All tags")
         self._show_favorites_var = tk.BooleanVar(value=False)
         self._state = load_editor_state()
         self._favorites = set(str(v) for v in self._state.get("favorites", {}).get("items", []))
-        self._sort_options = ["Name A-Z", "Name Z-A", "Favorites first", "Type", "ID"]
+        self._sort_options = ["Name A-Z", "Name Z-A", "Favorites first", "Type", "Pokédex #"]
 
         search_row = tk.Frame(self, bg=BG_MED)
         search_row.pack(fill=tk.X, padx=4, pady=(4, 0))
@@ -309,8 +310,37 @@ class SearchableList(tk.Frame):
             return {str(tag) for tag in tags}
         return self._tag_map.get(str(item), set())
 
+    def _normalize_sort_value(self, value):
+        if value is None:
+            return 999999
+        if isinstance(value, int):
+            return value
+        if isinstance(value, str):
+            s = value.strip()
+            if not s:
+                return 999999
+            if s.isdigit():
+                return int(s)
+            if s.startswith("NATIONAL_DEX_"):
+                s = s.replace("NATIONAL_DEX_", "")
+                if s.isdigit():
+                    return int(s)
+                dex_map = pparser.parse_national_dex_map()
+                return dex_map.get(s, 999999)
+            dex_map = pparser.parse_national_dex_map()
+            return dex_map.get(s, 999999)
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return 999999
+
     def _display_name(self, item_name):
         star = "★ " if item_name in self._favorites else "  "
+        sort_value = self._sort_values.get(str(item_name))
+        if sort_value is not None:
+            dex_num = self._normalize_sort_value(sort_value)
+            if dex_num != 999999:
+                return f"{star}#{dex_num:03d} - {item_name}"
         return f"{star}{item_name}"
 
     def _filter(self, *_):
@@ -332,14 +362,22 @@ class SearchableList(tk.Frame):
                 continue
             filtered.append(name)
 
+        def _id_sort_key(name):
+            val = self._normalize_sort_value(self._sort_values.get(str(name), 999999))
+            if val == 999999:
+                return (1, str(name).casefold())
+            return (0, val)
+
         if sort_mode == "Name Z-A":
-            filtered = sorted(filtered, key=str.casefold, reverse=True)
+            filtered = sorted(filtered, key=lambda name: str(name).casefold(), reverse=True)
         elif sort_mode == "Favorites first":
-            filtered = sorted(filtered, key=lambda name: (name not in self._favorites, str.casefold(name)))
+            filtered = sorted(filtered, key=lambda name: (name not in self._favorites, str(name).casefold()))
         elif sort_mode == "Type":
-            filtered = sorted(filtered, key=lambda name: (self._tag_map.get(name, set()), str.casefold(name)))
+            filtered = sorted(filtered, key=lambda name: (tuple(sorted(self._tag_map.get(name, set()))), str(name).casefold()))
+        elif sort_mode in ("ID", "Pokédex #"):
+            filtered = sorted(filtered, key=_id_sort_key)
         else:
-            filtered = sorted(filtered, key=str.casefold)
+            filtered = sorted(filtered, key=lambda name: str(name).casefold())
 
         self._lb.delete(0, tk.END)
         self._display_map = {}
@@ -362,8 +400,12 @@ class SearchableList(tk.Frame):
                 self._tag_var.set("All tags")
         self._filter()
 
-    def set_items(self, items, tags=None):
+    def set_items(self, items, tags=None, sort_values=None):
         self._all = list(items)
+        self._sort_values = {}
+        if sort_values is not None:
+            for key, value in (sort_values or {}).items():
+                self._sort_values[str(key)] = value
         if tags is not None:
             self.set_tags(tags)
         self._filter()
@@ -823,7 +865,18 @@ class PokemonTab(DarkFrame):
         for cb in self._ab_cbs:
             cb["values"] = ab_names
 
-        self._list.set_items(sorted(data.keys()), tags=build_tag_map(data, "pokemon"))
+        dex_map = {
+            name: int(fields.get("natDexNum", 99999))
+            for name, fields in data.items()
+            if str(fields.get("natDexNum", "")).strip().isdigit()
+        }
+        if dex_map:
+            self._list._sort_var.set("Pokédex #")
+        self._list.set_items(
+            sorted(data.keys(), key=lambda name: (int(dex_map.get(name, 99999)), str(name))),
+            tags=build_tag_map(data, "pokemon"),
+            sort_values=dex_map,
+        )
 
     def _load_species(self, name):
         self._current = name
@@ -903,6 +956,255 @@ class PokemonTab(DarkFrame):
         except Exception as e:
             messagebox.showerror("Save Error", str(e))
             self._status_lbl.config(text="✗ Error", fg=FG_ACCENT)
+
+
+# ── Pokédex Tab ───────────────────────────────────────────────────────────────
+
+
+class PokedexTab(DarkFrame):
+    def __init__(self, parent, app):
+        super().__init__(parent)
+        self.app = app
+        self._data = {}
+        self._current = None
+        self._img_ref = None
+        self._build_ui()
+
+    def _build_ui(self):
+        paned = tk.PanedWindow(
+            self, orient=tk.HORIZONTAL, bg=BG_DARK, sashwidth=6, sashrelief=tk.FLAT
+        )
+        paned.pack(fill=tk.BOTH, expand=True)
+
+        left = tk.Frame(paned, bg=BG_MED, width=240)
+        paned.add(left, minsize=200)
+        tk.Label(
+            left, text="POKÉDEX", bg=BG_MED, fg=FG_ACCENT, font=("Segoe UI", 11, "bold")
+        ).pack(pady=(10, 0))
+        self._list = SearchableList(left, on_select=self._load_entry)
+        self._list.pack(fill=tk.BOTH, expand=True)
+
+        right = DarkFrame(paned)
+        paned.add(right, minsize=500)
+
+        header = CardFrame(right, title="Pokédex Entry")
+        header.pack(fill=tk.X, padx=12, pady=10)
+
+        top_row = tk.Frame(header, bg=BG_CARD)
+        top_row.pack(fill=tk.X, padx=8, pady=8)
+
+        self._sprite = tk.Label(
+            top_row,
+            bg=BG_CARD,
+            text="🔎",
+            width=10,
+            height=7,
+            fg=FG_DIM,
+            font=("Segoe UI", 24),
+        )
+        self._sprite.pack(side=tk.LEFT, padx=(0, 12))
+
+        info = tk.Frame(top_row, bg=BG_CARD)
+        info.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        row1 = tk.Frame(info, bg=BG_CARD)
+        row1.pack(fill=tk.X, pady=3)
+
+        self._dex_lbl = tk.Label(
+            row1, text="#000", bg=BG_CARD, fg=FG_GOLD, font=("Segoe UI", 18, "bold")
+        )
+        self._dex_lbl.pack(side=tk.LEFT, padx=(0, 12))
+
+        self._name_lbl = tk.Label(
+            row1, text="", bg=BG_CARD, fg=FG_MAIN, font=("Segoe UI", 18, "bold")
+        )
+        self._name_lbl.pack(side=tk.LEFT)
+
+        self._favorite_btn = tk.Button(
+            row1,
+            text="☆ Favorite",
+            bg=BG_INPUT,
+            fg=FG_GOLD,
+            relief="flat",
+            activebackground=BG_INPUT,
+            activeforeground=FG_GOLD,
+            command=self._toggle_favorite,
+        )
+        self._favorite_btn.pack(side=tk.RIGHT)
+
+        row2 = tk.Frame(info, bg=BG_CARD)
+        row2.pack(fill=tk.X, pady=6)
+        self._cat_lbl = tk.Label(row2, text="", bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 10))
+        self._cat_lbl.pack(side=tk.LEFT)
+        self._type_frame = tk.Frame(row2, bg=BG_CARD)
+        self._type_frame.pack(side=tk.LEFT, padx=(12, 0))
+
+        row3 = tk.Frame(info, bg=BG_CARD)
+        row3.pack(fill=tk.X, pady=(0, 6))
+        self._gen_lbl = tk.Label(row3, text="", bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9))
+        self._gen_lbl.pack(side=tk.LEFT)
+
+        summary = CardFrame(right, title="Pokédex Summary")
+        summary.pack(fill=tk.X, padx=12, pady=(0, 8))
+        self._summary_lbl = tk.Label(
+            summary,
+            text="",
+            bg=BG_CARD,
+            fg=FG_MAIN,
+            justify="left",
+            wraplength=720,
+            font=("Segoe UI", 10),
+        )
+        self._summary_lbl.pack(anchor="w", padx=8, pady=(0, 8))
+
+        stats = CardFrame(right, title="Base Stats")
+        stats.pack(fill=tk.X, padx=12, pady=(0, 8))
+        stat_frame = tk.Frame(stats, bg=BG_CARD)
+        stat_frame.pack(fill=tk.X, padx=8, pady=(0, 8))
+        self._stat_labels = []
+        for i, (field, label, color, max_val) in enumerate(STAT_DEFS):
+            cell = tk.Frame(stat_frame, bg=BG_CARD)
+            cell.grid(row=i // 3, column=i % 3, padx=12, pady=6, sticky="w")
+            tk.Label(cell, text=label, bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9)).pack(anchor="w")
+            val = tk.Label(cell, text="0", bg=BG_CARD, fg=color, font=("Consolas", 11, "bold"))
+            val.pack(anchor="w")
+            self._stat_labels.append((field, val))
+
+        lower = tk.Frame(right, bg=BG_DARK)
+        lower.pack(fill=tk.BOTH, expand=True, padx=12, pady=(0, 10))
+
+        left_card = CardFrame(lower, title="Abilities")
+        left_card.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 6))
+        self._ability_labels = []
+        for _ in range(3):
+            lbl = tk.Label(
+                left_card,
+                bg=BG_CARD,
+                fg=FG_MAIN,
+                justify="left",
+                wraplength=260,
+                font=("Segoe UI", 9),
+            )
+            lbl.pack(anchor="w", padx=8, pady=4)
+            self._ability_labels.append(lbl)
+
+        right_card = CardFrame(lower, title="Basic Data")
+        right_card.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(6, 0))
+        self._meta_values = {}
+        for label_text in [
+            ("Catch Rate", "catchRate"),
+            ("Height", "height"),
+            ("Weight", "weight"),
+            ("Friendship", "friendship"),
+            ("Growth Rate", "growthRate"),
+            ("Gender Ratio", "genderRatio"),
+            ("Egg Groups", "eggGroups"),
+        ]:
+            row = tk.Frame(right_card, bg=BG_CARD)
+            row.pack(fill=tk.X, padx=8, pady=3)
+            tk.Label(
+                row,
+                text=f"{label_text[0]}:",
+                bg=BG_CARD,
+                fg=FG_DIM,
+                font=("Segoe UI", 9),
+                width=16,
+                anchor="e",
+            ).pack(side=tk.LEFT)
+            val = tk.Label(row, text="-", bg=BG_CARD, fg=FG_MAIN, font=("Segoe UI", 9))
+            val.pack(side=tk.LEFT, padx=(6, 0))
+            self._meta_values[label_text[1]] = val
+
+    def set_data(self, species, types, abilities_data):
+        self._data = species
+        self._types = types
+        self._abilities_data = abilities_data
+        dex_map = {
+            name: int(fields.get("natDexNum", 99999))
+            for name, fields in species.items()
+            if str(fields.get("natDexNum", "")).strip().isdigit()
+        }
+        self._list.set_items(
+            sorted(species.keys(), key=lambda name: (int(dex_map.get(name, 99999)), str(name))),
+            tags=build_tag_map(species, "pokemon"),
+            sort_values=dex_map,
+        )
+        if dex_map:
+            self._list._sort_var.set("Pokédex #")
+
+    def _toggle_favorite(self):
+        if not self._current:
+            return
+        self._list.toggle_favorite(self._current)
+        self._update_favorite_button()
+
+    def _update_favorite_button(self):
+        if not self._current:
+            return
+        if self._current in self._list._favorites:
+            self._favorite_btn.config(text="★ Favorited")
+        else:
+            self._favorite_btn.config(text="☆ Favorite")
+
+    def _load_entry(self, name):
+        self._current = name
+        fields = self._data.get(name, {})
+        dex = fields.get("natDexNum", "?")
+        self._dex_lbl.config(text=f"#{dex:03d}" if isinstance(dex, int) else f"#{dex}")
+        self._name_lbl.config(text=fields.get("speciesName", name))
+        self._cat_lbl.config(text=fields.get("categoryName", ""))
+        self._gen_lbl.config(
+            text=f"National Dex #{dex}  •  Growth {fields.get('growthRate', 'UNKNOWN')}"
+        )
+        self._summary_lbl.config(text=fields.get("description", ""))
+
+        for field, value in [
+            ("catchRate", fields.get("catchRate", "-")),
+            ("height", f"{fields.get('height', '-')} dm"),
+            ("weight", f"{fields.get('weight', '-')} hg"),
+            ("friendship", fields.get("friendship", "-")),
+            ("growthRate", fields.get("growthRate", "-")),
+            ("genderRatio", fields.get("genderRatio", "-")),
+            ("eggGroups", f"{fields.get('eggGroup1', '-')}/{fields.get('eggGroup2', '-')}"),
+        ]:
+            if field in self._meta_values:
+                self._meta_values[field].config(text=str(value))
+
+        for field, val_label in self._stat_labels:
+            val_label.config(text=str(fields.get(field, 0)))
+
+        for i, key in enumerate(["ability1", "ability2", "abilityH"]):
+            ability = fields.get(key, "NONE")
+            info = self._abilities_data.get(ability, {})
+            text = info.get("name", ability) if ability else "-"
+            desc = info.get("description")
+            if desc:
+                text = f"{text}: {desc}"
+            self._ability_labels[i].config(text=text)
+
+        for widget in self._type_frame.winfo_children():
+            widget.destroy()
+        for slot in [fields.get("type1", "NONE"), fields.get("type2", fields.get("type1", "NONE"))]:
+            badge = TypeBadge(self._type_frame, type_name=slot, size=(72, 24))
+            badge.pack(side=tk.LEFT, padx=(0, 4))
+
+        self._update_favorite_button()
+        threading.Thread(target=self._load_sprite, args=(name,), daemon=True).start()
+
+    def _load_sprite(self, name):
+        shiny = False
+        if "pokemon" in self.app._tabs and hasattr(self.app._tabs["pokemon"], "_shiny_var"):
+            shiny = self.app._tabs["pokemon"]._shiny_var.get()
+        sprite = img_util.get_pokemon_front(name, size=(128, 128), shiny=shiny)
+        self.after(0, self._set_sprite, sprite)
+
+    def _set_sprite(self, sprite):
+        if sprite:
+            self._sprite.configure(image=sprite, text="", width=0, height=0)
+            self._img_ref = sprite
+        else:
+            self._sprite.configure(image="", text="🔎", width=10, height=7)
+            self._img_ref = None
 
 
 # ── Moves Tab ──────────────────────────────────────────────────────────────────
@@ -1446,6 +1748,21 @@ class TrainersTab(DarkFrame):
             self._party_icon_labels.append(lbl)
             self._party_img_refs.append(None)
 
+        btn_frame = DarkFrame(right)
+        btn_frame.pack(fill=tk.X, padx=12, pady=(0, 10))
+        DarkButton(
+            btn_frame,
+            text="💾  Save Changes",
+            command=self._save,
+            color=BTN_SAVE,
+            padx=20,
+            pady=8,
+        ).pack(side=tk.LEFT)
+        self._status_lbl = tk.Label(
+            btn_frame, text="", bg=BG_DARK, fg=FG_GREEN, font=("Segoe UI", 10)
+        )
+        self._status_lbl.pack(side=tk.LEFT, padx=12)
+
     def set_data(self, data):
         self._data = data
         self._list.set_items(sorted(data.keys()), tags=build_tag_map(data, "trainer"))
@@ -1518,6 +1835,23 @@ class TrainersTab(DarkFrame):
         else:
             lbl.configure(image="", text="?", width=2)
             self._party_img_refs[idx] = None
+
+    def _save(self):
+        if not self._current:
+            return
+        fields = {}
+        for field in ["trainerName", "trainerClass", "trainerPic", "gender", "battleType"]:
+            value = self._trainer_vars[field].get().strip()
+            if value:
+                fields[field] = value
+        source = self._data.get(self._current, {}).get("_source_file")
+        try:
+            writer.save_trainer(self._current, fields, source)
+            self._data[self._current].update(fields)
+            self._status_lbl.config(text="✓ Saved!", fg=FG_GREEN)
+        except Exception as e:
+            messagebox.showerror("Save Error", str(e))
+            self._status_lbl.config(text="✗ Error", fg=FG_ACCENT)
 
 
 # ── Types Tab ──────────────────────────────────────────────────────────────────
@@ -2131,6 +2465,7 @@ class App(tk.Tk):
                 ProjectOverviewTab(self._nb, self) if ProjectOverviewTab else None
             ),
             "pokemon": PokemonTab(self._nb, self),
+            "pokedex": PokedexTab(self._nb, self),
             "moves": MovesTab(self._nb, self),
             "items": ItemsTab(self._nb, self),
             "trainers": TrainersTab(self._nb, self),
@@ -2145,6 +2480,7 @@ class App(tk.Tk):
         tab_labels = {
             "overview": "  🧭 Overview  ",
             "pokemon": "  🔴 Pokémon  ",
+            "pokedex": "  📘 Pokédex  ",
             "moves": "  ⚡ Moves  ",
             "items": "  🎒 Items  ",
             "trainers": "  🧢 Trainers  ",
@@ -2189,6 +2525,7 @@ class App(tk.Tk):
         abilities_data = loaded.get("abilities", {})
 
         self._tabs["pokemon"].set_data(species, types, abilities_list, abilities_data)
+        self._tabs["pokedex"].set_data(species, types, abilities_data)
         self._tabs["moves"].set_data(moves, types)
         self._tabs["items"].set_data(items)
         self._tabs["trainers"].set_data(trainers)

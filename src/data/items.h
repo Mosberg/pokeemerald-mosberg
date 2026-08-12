@@ -632,8 +632,8 @@ const struct ItemInfo gItemsInfo[] =
     [ITEM_POTION] =
     {
         .name = ITEM_NAME("Potion"),
-        .price = (I_PRICE >= GEN_7) ? 200 : 300,
-        .holdEffectParam = 20,
+        .price = 300,
+        .holdEffectParam = 0,
         .description = COMPOUND_STRING(
             "Restores the HP of\n"
             "a Pokémon by\n"

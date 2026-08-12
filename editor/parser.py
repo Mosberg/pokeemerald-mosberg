@@ -114,6 +114,11 @@ def parse_types_list():
     ]
 
 
+def parse_national_dex_map():
+    """Return {NATIONAL_DEX_BULBASAUR: 1, ...} from the dex enum."""
+    return parse_enum(ROOT / "include/constants/pokedex.h", "NATIONAL_DEX_")
+
+
 # --- Species info parser ---
 
 def _extract_species_blocks(gen_file):
@@ -204,10 +209,11 @@ def _parse_species_block(block):
         desc = desc.replace('\\n', '\n')
         fields['description'] = desc
 
-    # natDexNum
+    # natDexNum: map enum constant to numeric national dex position.
     m = re.search(r'\.natDexNum\s*=\s*(NATIONAL_DEX_\w+)', block)
     if m:
-        fields['natDexNum'] = m.group(1).replace('NATIONAL_DEX_', '')
+        dex_const = m.group(1)
+        fields['natDexNum'] = parse_national_dex_map().get(dex_const.replace('NATIONAL_DEX_', ''), 99999)
 
     # Egg groups
     m = re.search(r'\.eggGroups\s*=\s*MON_EGG_GROUPS\(([^)]+)\)', block)
@@ -407,6 +413,7 @@ def load_all_trainers():
             pos += 1
         block = text[brace_start+1:pos]
         fields = _parse_trainer_block(block)
+        fields['_source_file'] = str(filepath)
         results[name] = fields
 
     return results

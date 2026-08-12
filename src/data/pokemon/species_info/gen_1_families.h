@@ -6,7 +6,7 @@ const struct SpeciesInfo gSpeciesInfoGen1[] =
 #if P_FAMILY_BULBASAUR
     [SPECIES_BULBASAUR] =
     {
-        .baseHP        = 45,
+        .baseHP        = 46,
         .baseAttack    = 49,
         .baseDefense   = 49,
         .baseSpeed     = 45,

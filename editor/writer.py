@@ -199,3 +199,58 @@ def save_item(item_name, fields, source_file=None):
         text = text[:start] + new_block + text[end:]
 
     filepath.write_text(text, encoding="utf-8")
+
+
+def save_trainer(trainer_name, fields, source_file=None):
+    """Save modified trainer fields back to trainers.h / trainers.party."""
+    if source_file:
+        filepath = Path(source_file)
+    else:
+        filepath = ROOT / "src/data/trainers.h"
+        if not filepath.exists():
+            filepath = ROOT / "src/data/trainers.party"
+
+    text = filepath.read_text(encoding="utf-8", errors="replace")
+    key_pattern = rf'\[DIFFICULTY_\w+\]\[TRAINER_{re.escape(trainer_name)}\]\s*='
+    start, end = _find_block_range(text, key_pattern)
+    if start is None:
+        raise ValueError(f"Could not find block for TRAINER_{trainer_name}")
+
+    for field in ['trainerName', 'trainerClass', 'trainerPic', 'gender', 'battleType']:
+        if field not in fields:
+            continue
+        block = text[start:end]
+        if field == 'trainerName':
+            new_block = re.sub(
+                r'(\.trainerName\s*=\s*_\(")[^"]*(")',
+                rf'\g<1>{fields[field]}\2',
+                block,
+            )
+        elif field == 'trainerClass':
+            new_block = re.sub(
+                r'(\.trainerClass\s*=\s*)TRAINER_CLASS_\w+',
+                rf'\g<1>TRAINER_CLASS_{fields[field]}',
+                block,
+            )
+        elif field == 'trainerPic':
+            new_block = re.sub(
+                r'(\.trainerPic\s*=\s*)TRAINER_PIC_\w+',
+                rf'\g<1>TRAINER_PIC_{fields[field]}',
+                block,
+            )
+        elif field == 'gender':
+            new_block = re.sub(
+                r'(\.gender\s*=\s*)TRAINER_GENDER_\w+',
+                rf'\g<1>TRAINER_GENDER_{fields[field]}',
+                block,
+            )
+        elif field == 'battleType':
+            new_block = re.sub(
+                r'(\.battleType\s*=\s*)TRAINER_BATTLE_TYPE_\w+',
+                rf'\g<1>TRAINER_BATTLE_TYPE_{fields[field]}',
+                block,
+            )
+        text = text[:start] + new_block + text[end:]
+        start, end = _find_block_range(text, key_pattern)
+
+    filepath.write_text(text, encoding="utf-8")
