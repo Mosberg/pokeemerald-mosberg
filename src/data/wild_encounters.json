@@ -36577,6 +36577,75 @@
               }
             ]
           }
+        },
+        {
+          "map": "MAP_LITTLEROOT_TOWN",
+          "base_label": "gLittlerootTown",
+          "land_mons": {
+            "encounter_rate": 7,
+            "mons": [
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_FERROVALE"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_ASTRALIT"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_NIMBARA"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_FERROVALE"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_ASTRALIT"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_NIMBARA"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_FERROVALE"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_ASTRALIT"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_NIMBARA"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_FERROVALE"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_ASTRALIT"
+              },
+              {
+                "min_level": 5,
+                "max_level": 5,
+                "species": "SPECIES_NIMBARA"
+              }
+            ]
+          }
         }
       ]
     },

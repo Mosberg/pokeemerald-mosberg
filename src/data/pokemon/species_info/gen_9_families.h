@@ -8514,6 +8514,9 @@ const struct SpeciesInfo gSpeciesInfoGen9[] =
     },
 #endif //P_FAMILY_TERAPAGOS
 
+    
+    
+    
 #if P_FAMILY_PECHARUNT
     [SPECIES_PECHARUNT] =
     {

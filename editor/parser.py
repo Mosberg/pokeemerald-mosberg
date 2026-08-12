@@ -226,7 +226,7 @@ def _parse_species_block(block):
 
 
 def load_all_species():
-    """Load all species info from all gen files. Returns {SPECIES_NAME: fields}."""
+    """Load all species info from all gen files and the custom species section. Returns {SPECIES_NAME: fields}."""
     species_dir = ROOT / "src/data/pokemon/species_info"
     all_species = {}
     for gen_file in sorted(species_dir.glob("gen_*.h")):
@@ -234,6 +234,31 @@ def load_all_species():
         all_species.update(blocks)
         for name, fields in blocks.items():
             fields['_source_file'] = str(gen_file)
+
+    custom_file = ROOT / "src/data/pokemon/species_info.h"
+    if custom_file.exists():
+        text = custom_file.read_text(encoding="utf-8", errors="replace")
+        marker = "You may add any custom species below this point"
+        tail = text[text.find(marker) + len(marker):] if marker in text else text
+        pattern = re.compile(r'\[SPECIES_(\w+)\]\s*=\s*\{', re.MULTILINE)
+        starts = [(m.start(), m.group(1)) for m in pattern.finditer(tail)]
+        if starts:
+            for start, name in starts:
+                brace_start = tail.index('{', start)
+                depth = 0
+                pos = brace_start
+                while pos < len(tail):
+                    if tail[pos] == '{':
+                        depth += 1
+                    elif tail[pos] == '}':
+                        depth -= 1
+                        if depth == 0:
+                            break
+                    pos += 1
+                block = tail[brace_start + 1:pos]
+                fields = _parse_species_block(block)
+                fields['_source_file'] = str(custom_file)
+                all_species[name] = fields
     return all_species
 
 
