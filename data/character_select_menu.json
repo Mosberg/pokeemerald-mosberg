@@ -1,0 +1,86 @@
+{
+  "characters": [
+    {
+      "id": "brendan",
+      "name": "Brendan",
+      "gender": "male",
+      "trainerPic": "TRAINER_PIC_BRENDAN",
+      "className": "Rival",
+      "sortOrder": 1,
+      "frontAsset": "graphics\\trainers\\front_pics\\brendan.png",
+      "backAsset": "graphics\\trainers\\back_pics\\brendan.png",
+      "description": "Default male rival-style avatar.",
+      "tags": [
+        "male",
+        "rival",
+        "default"
+      ],
+      "isDefault": true
+    },
+    {
+      "id": "may",
+      "name": "May",
+      "gender": "female",
+      "trainerPic": "TRAINER_PIC_MAY",
+      "className": "Rival",
+      "sortOrder": 2,
+      "frontAsset": "graphics\\trainers\\front_pics\\may.png",
+      "backAsset": "graphics\\trainers\\back_pics\\may.png",
+      "description": "Default female rival-style avatar.",
+      "tags": [
+        "female",
+        "rival"
+      ],
+      "isDefault": false
+    },
+    {
+      "id": "red",
+      "name": "Red",
+      "gender": "male",
+      "trainerPic": "TRAINER_PIC_RED",
+      "className": "Champion",
+      "sortOrder": 3,
+      "frontAsset": "graphics\\trainers\\front_pics\\red.png",
+      "backAsset": "graphics\\trainers\\back_pics\\red.png",
+      "description": "Classic male trainer look with Kanto styling.",
+      "tags": [
+        "male",
+        "classic",
+        "kanto"
+      ],
+      "isDefault": false
+    },
+    {
+      "id": "leaf",
+      "name": "Leaf",
+      "gender": "female",
+      "trainerPic": "TRAINER_PIC_LEAF",
+      "className": "Champion",
+      "sortOrder": 4,
+      "frontAsset": "graphics\\trainers\\front_pics\\leaf.png",
+      "backAsset": "graphics\\trainers\\back_pics\\leaf.png",
+      "description": "Classic female trainer look with Kanto styling.",
+      "tags": [
+        "female",
+        "classic",
+        "kanto"
+      ],
+      "isDefault": false
+    },
+    {
+      "id": "wally_char",
+      "name": "Wally",
+      "gender": "male",
+      "trainerPic": "TRAINER_PIC_WALLY",
+      "className": "NPC",
+      "sortOrder": 5,
+      "frontAsset": "graphics\\trainers\\front_pics\\wally.png",
+      "backAsset": "graphics\\trainers\\back_pics\\wally.png",
+      "description": "Wally",
+      "tags": [
+        "male"
+      ],
+      "isDefault": true
+    }
+  ]
+}

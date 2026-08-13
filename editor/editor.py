@@ -73,12 +73,39 @@ def build_tag_map(data, label="item"):
 
 def _load_modular_tabs():
     try:
+        from editor.modules.character_select import CharacterSelectTab
+        from editor.modules.graphics_editor import GraphicsEditorTab
         from editor.modules.project_overview import ProjectOverviewTab
         from editor.modules.project_settings import ProjectSettingsTab
         from editor.modules.world_data import WorldDataTab
-        return ProjectOverviewTab, ProjectSettingsTab, WorldDataTab
+        return ProjectOverviewTab, ProjectSettingsTab, WorldDataTab, CharacterSelectTab, GraphicsEditorTab
     except Exception:
-        return None, None, None
+        try:
+            import importlib.util
+            import sys
+            root = Path(__file__).resolve().parent
+            for name in [
+                "character_select.py",
+                "graphics_editor.py",
+                "project_overview.py",
+                "project_settings.py",
+                "world_data.py",
+            ]:
+                spec = importlib.util.spec_from_file_location(
+                    f"editor.modules.{name[:-3]}", root / "modules" / name
+                )
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[spec.name] = module
+                    spec.loader.exec_module(module)
+            from editor.modules.character_select import CharacterSelectTab
+            from editor.modules.graphics_editor import GraphicsEditorTab
+            from editor.modules.project_overview import ProjectOverviewTab
+            from editor.modules.project_settings import ProjectSettingsTab
+            from editor.modules.world_data import WorldDataTab
+            return ProjectOverviewTab, ProjectSettingsTab, WorldDataTab, CharacterSelectTab, GraphicsEditorTab
+        except Exception:
+            return None, None, None, None, None
 
 # ── Theme colours ──────────────────────────────────────────────────────────────
 BG_DARK = "#1a1a2e"
@@ -2432,8 +2459,14 @@ class App(tk.Tk):
         )
 
     def _build_ui(self):
-        global ProjectOverviewTab, ProjectSettingsTab, WorldDataTab
-        ProjectOverviewTab, ProjectSettingsTab, WorldDataTab = _load_modular_tabs()
+        global ProjectOverviewTab, ProjectSettingsTab, WorldDataTab, CharacterSelectTab, GraphicsEditorTab
+        (
+            ProjectOverviewTab,
+            ProjectSettingsTab,
+            WorldDataTab,
+            CharacterSelectTab,
+            GraphicsEditorTab,
+        ) = _load_modular_tabs()
 
         # Top header bar
         header = tk.Frame(self, bg="#0d0d1a", height=52)
@@ -2471,6 +2504,10 @@ class App(tk.Tk):
             "trainers": TrainersTab(self._nb, self),
             "types": TypesTab(self._nb, self),
             "abilities": AbilitiesTab(self._nb, self),
+            "character_select": (
+                CharacterSelectTab(self._nb, self) if CharacterSelectTab else None
+            ),
+            "graphics": GraphicsEditorTab(self._nb, self) if GraphicsEditorTab else None,
             "world": WorldDataTab(self._nb, self) if WorldDataTab else None,
             "settings": (
                 ProjectSettingsTab(self._nb, self) if ProjectSettingsTab else None
@@ -2486,6 +2523,8 @@ class App(tk.Tk):
             "trainers": "  🧢 Trainers  ",
             "types": "  📊 Types  ",
             "abilities": "  ✨ Abilities  ",
+            "character_select": "  🎭 Character Select  ",
+            "graphics": "  🖼 Graphics  ",
             "world": "  🌍 World  ",
             "settings": "  ⚙️ Settings  ",
             "build": "  🔨 Build  ",

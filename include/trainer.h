@@ -5,7 +5,9 @@
 #include "constants/trainers.h"
 
 enum TrainerPicID GetPlayerTrainerPic(enum Gender gender, enum GameVersion version);
-
+void SetSelectedPlayerTrainerPic(enum TrainerPicID trainerPicId);
+void ClearSelectedPlayerTrainerPic(void);
+enum TrainerPicID GetSelectedPlayerTrainerPic(void);
 
 static inline u16 GetTrainerPicTag(enum TrainerPicID trainerPicId, bool32 isFrontPic)
 {
